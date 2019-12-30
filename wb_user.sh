@@ -37,6 +37,22 @@ new(){
          fi
    done
 }
+
+rm(){
+    while IFS=, read -r fullname uname password groups; do
+        C_UNAME+=($uname)
+    done <"$1"
+
+    for i in "${!C_UNAME[@]}"; do
+        userdel "${C_UNAME[$i]}" 2>/dev/null
+        SAIDA=$?
+        if [ $SAIDA -eq 0 ]; then
+            printf "User ${C_UNAME[$i]} has been removed \n"
+        elif [ $SAIDA -eq 6 ]; then
+            printf "User ${C_UNAME[$i]} not found \n"
+        fi
+    done
+}
 #+----------+
 #+-- CHEK --+
 #+----------+
@@ -78,7 +94,7 @@ case $2 in
    -new)
       new $1
    ;; -rm)
-      echo "rm"
+      rm $1
    ;; -update)
       echo "update"
    ;; -lock)
