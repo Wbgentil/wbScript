@@ -35,3 +35,19 @@ cat <<EOF
    -update        : To update a value to user:
 EOF
 fi
+
+case $2 in 
+   -new)
+      echo "new"
+   ;; -rm)
+      echo "rm"
+   ;; -update)
+      echo "update"
+   ;; -lock)
+      echo "lock"
+   ;; -unlock)
+      echo "unlock"
+   ;; *)
+      echo "invalid"
+   ;;
+esac
