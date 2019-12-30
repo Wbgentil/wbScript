@@ -53,6 +53,38 @@ rm(){
         fi
     done
 }
+
+lock(){
+    while IFS=, read -r fullname uname password groups; do
+        C_UNAME+=($uname)
+    done <"$1"
+
+    for i in "${!C_UNAME[@]}"; do
+        usermod -L "${C_UNAME[$i]}" 2>/dev/null
+        SAIDA=$?
+        if [ $SAIDA -eq 0 ]; then
+            printf "User ${C_UNAME[$i]} locked \n"
+        else
+            printf "Generic Error \n"
+        fi
+    done
+}
+
+unlock(){
+    while IFS=, read -r fullname uname password groups; do
+        C_UNAME+=($uname)
+    done <"$1"
+
+    for i in "${!C_UNAME[@]}"; do
+        usermod -U "${C_UNAME[$i]}"
+        SAIDA=$?
+        if [ $SAIDA -eq 0 ]; then
+            printf "User ${C_UNAME[$i]} unlocked \n"
+        else
+            printf "Generic Error \n"
+        fi
+    done
+}
 #+----------+
 #+-- CHEK --+
 #+----------+
@@ -98,9 +130,9 @@ case $2 in
    ;; -update)
       echo "update"
    ;; -lock)
-      echo "lock"
+      lock $1
    ;; -unlock)
-      echo "unlock"
+      unlock $1
    ;; *)
       echo "invalid"
    ;;
