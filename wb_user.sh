@@ -14,24 +14,24 @@ SAIDA=''
 #+--------------+
 
 if [ -z "$1" ]; then
-    printf -e 'Args 1: Invalid please use:
-    bash wb_user.sh /home/{USER}/path/list_user.csv [$2]
-    '
-    exit 1
+   printf -e 'Args 1: Invalid please use:
+   bash wb_user.sh /home/{USER}/path/list_user.csv [$2]
+   '
+   exit 1
 fi
 
 if [ ! -f $1 ] && [ ! $1 == *.csv ]; then
-    printf 'Please use a .CSV file \n'
-    exit 1
+   printf 'Please use a .CSV file \n'
+   exit 1
 fi
 
 if [ -z "$2" ]; then
 cat <<EOF
-    Args 2: Invalid please use:
-    -new           : To create user;
-    -rm            : To remove user;
-    -lock         : To block accont user;
-    -unlock        : To unlock accont user;
-    -update        : To update a value to user:
+   Args 2: Invalid please use:
+   -new           : To create user;
+   -rm            : To remove user;
+   -lock          : To block accont user;
+   -unlock        : To unlock accont user;
+   -update        : To update a value to user:
 EOF
 fi
