@@ -85,6 +85,71 @@ unlock(){
         fi
     done
 }
+
+update(){
+   while IFS=, read -r fullname olduname newuname newpassword groups others; do
+      C_OLDUNAME+=($olduname)
+      C_NEWUNAME+=($newuname)
+      C_NEWPASSWORD+=($newpassword)
+      C_GROUP+=($groups)
+   done <"$1"
+   echo "$groups"
+cat <<EOF
+   Select a option:
+   1. Change Password
+   2. Add user a new Group
+   3. Add user a SUDO/WHEEL group
+   4. Change the username
+EOF
+
+   read OPTION
+   case $OPTION in
+      1)
+         for i in "${!C_OLDUNAME[@]}"; do
+            echo -e "${C_NEWPASSWORD[$i]}" | passwd --stdin "${C_OLDUNAME[$i]}"
+         done
+      ;;
+      2)
+         for i in "${!C_OLDUNAME[@]}"; do
+            usermod -a -G "${C_GROUP[$i]}" "${C_OLDUNAME[$i]}"
+            if [ $? -eq 0 ]; then
+               printf "User ${C_OLDUNAME[$i]} has been add in ${C_GROUP[$i]}\n"
+            else
+               printf "Generic Error in add a user in group, please contact your admin"
+               exit 1
+            fi
+         done
+      ;;
+      3)
+         for i in "${!C_OLDUNAME[@]}"; do
+            usermod -a -G wheel "${C_OLDUNAME[$i]}"
+            if [ $? -eq 0 ]; then
+               printf "User ${C_OLDUNAME[$i]} has been add in ${C_GROUP[$i]} \n"
+            else
+               printf "Generic Error in add a user in group, please contact your admin \n"
+               exit 1
+            fi
+         done
+      ;; 
+      4)
+         for i in "${!C_OLDUNAME[@]}"; do
+            if [ ! "${C_NEWUNAME[$i]}" == "${C_OLDUNAME[$i]}" ]; then
+               usermod -l "${C_NEWUNAME[$i]}" "${C_OLDUNAME[$i]}" 1>/dev/null 2>/dev/null
+               SAIDA=$?
+               if [ $SAIDA -eq 0 ]; then
+                  printf "Username changed from ${C_OLDUNAME[$i]} to ${C_NEWUNAME[$i]} \n"
+               elif [ $SAIDA -eq 8 ]; then
+                  printf "User ${C_OLDUNAME[$i]} has open process, please kill processes with 'ps -ef | grep ${C_OLDUNAME[$i]}' and try again \n"
+               fi
+            fi
+         done
+      ;;
+      *)
+         printf "Invalid option, please try again"
+         exit 1
+      ;;
+   esac
+}
 #+----------+
 #+-- CHEK --+
 #+----------+
@@ -100,7 +165,7 @@ if [ "$1" == "man" ] || [ "$1" == "MAN" ]; then
    printf "To use this script use a follow example:
    wb_user.sh /home/user/docs/file.csv -opt
    
-   Where: \$1 is .CSv file path
+   Where: \$1 is .CSV file path
           \$2 is option\n"
 
    exit 1
@@ -128,12 +193,12 @@ case $2 in
    ;; -rm)
       rm $1
    ;; -update)
-      echo "update"
+      update $1
    ;; -lock)
       lock $1
    ;; -unlock)
       unlock $1
    ;; *)
-      echo "invalid"
+      printf "Invalid arg, please use wb_user.sh man to example\n"
    ;;
 esac
