@@ -13,19 +13,22 @@ SAIDA=''
 #+-- FUNC --+
 #+----------+
 
-CSV_READ(){
-   while IFS=, read -r fullname uname password groups others; do
+new(){
+    while IFS=, read -r fullname uname password groups; do
+      C_FULLNAME+=($fullname)
       C_UNAME+=($uname)
       C_PASSWORD+=($password)
       C_GROUP+=($groups)
-   done <"$1"
+    done <"$1"
 
-   echo "${!C_UNAME[@]}"
-
-   for i in "${!C_UNAME[@]}"; do
-      printf "Username: ${C_UNAME[$i]}\n"
-      printf "Password: ${C_PASSWORD[$i]}\n"
-      printf "Grupo: ${C_GROUP[$i]}\n\n"
+    for i in "${!C_UNAME[@]}"; do
+      if [ $(grep "${C_GROUP[$i]}" /etc/group | wc -l) -lt 1 ]; then
+         printf "Group ${C_GROUP[$i]} not found in /etc/group"
+         exit 1
+      else
+         useradd -g "${C_GROUP[$i]}" -s /bin/bash -p "$(echo "${C_PASSWORD[$i]}" | openssl passwd -1 -stdin)" "${C_UNAME[$i]}" 1>/dev/null 2>/dev/null
+         printf "User ${C_UNAME[$i]} has been create with success! \n\n"
+      fi
    done
 }
 #+----------+
@@ -67,7 +70,7 @@ fi
 
 case $2 in 
    -new)
-      CSV_READ $1
+      new $1
    ;; -rm)
       echo "rm"
    ;; -update)
