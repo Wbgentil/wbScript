@@ -22,13 +22,19 @@ new(){
     done <"$1"
 
     for i in "${!C_UNAME[@]}"; do
-      if [ $(grep "${C_GROUP[$i]}" /etc/group | wc -l) -lt 1 ]; then
-         printf "Group ${C_GROUP[$i]} not found in /etc/group"
-         exit 1
-      else
-         useradd -g "${C_GROUP[$i]}" -s /bin/bash -p "$(echo "${C_PASSWORD[$i]}" | openssl passwd -1 -stdin)" "${C_UNAME[$i]}" 1>/dev/null 2>/dev/null
-         printf "User ${C_UNAME[$i]} has been create with success! \n\n"
-      fi
+      useradd -g "${C_GROUP[$i]}" -s /bin/bash -p "$(echo "${C_PASSWORD[$i]}" | openssl passwd -1 -stdin)" "${C_UNAME[$i]}" 1>/dev/null 2>/dev/null
+         SAIDA=$?
+         if [ "$SAIDA" -eq 0 ]; then
+            printf "User ${C_UNAME[$i]} has been create with success! \n"
+         elif [ "$SAIDA" -eq 6 ]; then
+            printf "Error to create user ${C_UNAME[$i]}, group ${C_GROUP[$i]} not found\n"
+            exit 1
+         elif [ "$SAIDA" -eq 9 ]; then
+            printf "User ${C_UNAME[$i]} exist\n"
+         else
+            printf "An error occurred, please contact admin system \n"
+            exit 1
+         fi
    done
 }
 #+----------+
