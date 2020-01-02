@@ -9,6 +9,10 @@ ROOTPASS=''
 #+--------------+
 #+ -- checks -- +
 #+--------------+
+if [[ $EUID -ne 0 ]]; then
+   echo "Please, execute with root!" 1>&2
+   exit 100
+fi
 
 [ "$1" == "man" ] && clear && printf "
     Use to manipulate permissions on MySQL database

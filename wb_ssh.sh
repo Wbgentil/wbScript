@@ -7,6 +7,10 @@ SAIDA=''
 #+--------------+
 #+ -- checks -- +
 #+--------------+
+if [[ $EUID -ne 0 ]]; then
+   echo "Please, execute with root!" 1>&2
+   exit 100
+fi
 
 if [ "$1" == "man" ] && [ ! "$1" == "-u" ]; then
     clear 

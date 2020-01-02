@@ -44,7 +44,7 @@ rm(){
     done <"$1"
 
     for i in "${!C_UNAME[@]}"; do
-        userdel "${C_UNAME[$i]}" 2>/dev/null
+        userdel "${C_UNAME[$i]}" 
         SAIDA=$?
         if [ $SAIDA -eq 0 ]; then
             printf "User ${C_UNAME[$i]} has been removed \n"
@@ -153,6 +153,10 @@ EOF
 #+----------+
 #+-- CHEK --+
 #+----------+
+if [[ $EUID -ne 0 ]]; then
+   echo "Please, execute with root!" 1>&2
+   exit 100
+fi
 
 if [ -z "$1" ]; then
    printf -e 'Args 1: Invalid please use:

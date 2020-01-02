@@ -61,11 +61,11 @@ Replace X to value of minutes do u need
       sleep 2
       if [ ! -z $3 ] && [ $3 == '-path' ] && [ -d ${4%/*} ]; then
          echo $NOW >> $4
-         ps -ef | grep $2 | grep -v 'grep' >> $4 
+         ps -ef | grep $2 | grep -v 'grep' | grep -v 'wb_mon.sh' >> $4 
          SAIDA=$?
       else
          echo $NOW >> /tmp/wb_mon.log
-         ps -ef | grep $2 | grep -v 'grep' >> /tmp/wb_mon.log
+         ps -ef | grep $2 | grep -v 'grep' | grep -v 'wb_mon.sh' >> /tmp/wb_mon.log
          SAIDA=$?
          printf "LOG salvo em /tmp/wb_mon.log"
 
@@ -78,11 +78,11 @@ Replace X to value of minutes do u need
       printf "\n\n%-120s" "Extraindo log de todos os processos"
       sleep 2
       if [ -d ${4%/*} ]; then
-         ps -ef >> $4
+         ps -ef | grep -v 'wb_mon.sh' >> $4
          SAIDA=$?
       else
          echo $NOW >> /tmp/wb_mon.log 
-         ps -ef >> /tmp/wb_mon.log
+         ps -ef | grep -v 'wb_mon.sh' >> /tmp/wb_mon.log
          SAIDA=$?
       fi
       if [ $SAIDA -eq "0" ]; then echo -e "[    OK    ]"; else exit; fi
@@ -91,7 +91,7 @@ Replace X to value of minutes do u need
       echo $NOW >> /tmp/wb_mon.log
       printf "\n\n%-120s" "Extraindo log de todos os processos $2"
       sleep 2
-      ps -ef >> /tmp/wb_mon.log
+      ps -ef | grep -v 'wb_mon.sh' >> /tmp/wb_mon.log
       SAIDA=$?
       if [ $SAIDA -eq "0" ]; then echo -e "[    OK    ]"; else exit; fi
    ;;
